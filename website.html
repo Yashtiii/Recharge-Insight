@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RechargeInsight · Kanpur Groundwater</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet" />
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  /* ─── Design Tokens ─── */
+  :root {
+    --ink:       #1a1f2e;
+    --ink-soft:  #3d4455;
+    --mist:      #f5f6f9;
+    --white:     #ffffff;
+    --border:    #e2e5ee;
+
+    --z-very-good: #2d7a3a;
+    --z-good:      #6db56e;
+    --z-moderate:  #e8a838;
+    --z-poor:      #d96c47;
+    --z-very-poor: #8b1a1a;
+
+    --accent:    #1e6fbd;
+    --accent-lt: #eaf2fb;
+
+    --radius:    12px;
+    --shadow-sm: 0 2px 8px rgba(26,31,46,.07);
+    --shadow-md: 0 6px 24px rgba(26,31,46,.12);
+  }
+
+  /* ─── Reset ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--mist); color: var(--ink); }
+
+  /* ─── Layout ─── */
+  #app { display: grid; grid-template-rows: 58px 1fr; height: 100vh; overflow: hidden; }
+
+  /* ─── Top Bar ─── */
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    background: var(--white);
+    border-bottom: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    z-index: 1000;
+  }
+  .topbar span{
+padding:6px 12px;
+border-radius:6px;
+}
+
+.topbar span:hover{
+background:#eef3fb;
+}
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { font-size: 22px; }
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 600;
+    letter-spacing: -.3px;
+    color: var(--ink);
+  }
+  .brand-name span { color: var(--accent); }
+  .brand-sub {
+    font-size: 11px; font-weight: 400; color: var(--ink-soft);
+    border-left: 1px solid var(--border);
+    padding-left: 12px; margin-left: 4px;
+    letter-spacing: .3px; text-transform: uppercase;
+  }
+
+  .topbar-meta { font-size: 11px; color: var(--ink-soft); letter-spacing: .3px; }
+  .topbar-meta strong { color: var(--ink); }
+
+  /* ─── Main Area ─── */
+  #main { display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
+
+  /* ─── Sidebar ─── */
+  #sidebar {
+    display: flex; flex-direction: column; gap: 0;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 500;
+  }
+  .sidebar-section {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-section:last-child { border-bottom: none; flex: 1; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+
+  /* Legend */
+  .legend-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; transition: background .15s;
+    margin-bottom: 3px;
+  }
+  .legend-item:hover { background:#eef3fb; }
+  .legend-item.active { background: var(--accent-lt); }
+  .swatch {
+    width: 14px; height: 14px; border-radius: 4px;
+    flex-shrink: 0; margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .legend-content { flex: 1; }
+  .legend-zone { font-size: 13px; font-weight: 500; line-height: 1.2; }
+  .legend-structure { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .legend-pct {
+    font-size: 11px; font-weight: 600; color: var(--ink-soft);
+    background: var(--mist); padding: 2px 6px; border-radius: 20px;
+    align-self: center; white-space: nowrap;
+  }
+  .legend-item.active .legend-pct { background: var(--accent); color: #fff; }
+
+  /* Stats strip */
+  .stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card {
+    background: var(--mist); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat-label { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .6px; }
+  .stat-val { font-size: 19px; font-weight: 600; color: var(--ink); line-height: 1.2; margin-top: 1px; }
+  .stat-sub { font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+
+  /* Popup card */
+  #popup-card {
+    display: none;
+    flex-direction: column; gap: 12px;
+  }
+  #popup-card.visible { display: flex; }
+
+  .popup-header { display: flex; align-items: center; gap: 10px; }
+  .popup-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+    flex-shrink: 0;
+  }
+  .popup-zone { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
+  .popup-score-row { display: flex; align-items: center; gap: 8px; }
+  .score-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: .4px;
+    padding: 3px 9px; border-radius: 20px; background: var(--mist);
+    color: var(--ink-soft);
+  }
+  .score-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 3px; transition: width .4s; }
+
+  .rec-box {
+    background: var(--mist); border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; color: var(--ink-soft);
+    border-left: 3px solid var(--accent);
+  }
+  .rec-box strong { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
+
+  /* Calculator */
+  .calc-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .calc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .calc-label { font-size: 11px; color: var(--ink-soft); flex: 1; }
+  .calc-input {
+    width: 70px; font-size: 12px; font-family: inherit;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; outline: none; color: var(--ink);
+    background: var(--white);
+    transition: border-color .15s;
+  }
+  .calc-input:focus { border-color: var(--accent); }
+  .calc-btn {
+    width: 100%; padding: 9px; font-size: 12px; font-weight: 600;
+    font-family: inherit; letter-spacing: .2px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .calc-btn:hover { opacity: .88; }
+  .calc-result {
+    font-size: 13px; font-weight: 600; color: var(--accent);
+    text-align: center; margin-top: 4px; min-height: 18px;
+  }
+
+  #hint-text {
+    font-size: 12px; color: var(--ink-soft); text-align: center;
+    padding: 20px 0;
+    font-style: italic;
+  }
+
+  /* ─── Map ─── */
+  #map { width: 100%; height: 100%;
+    border-left:1px solid var(--border);
+ }
+  .leaflet-container { font-family: 'DM Sans', sans-serif !important;
+ }
+
+  /* Custom attribution */
+  .leaflet-control-attribution {
+    font-size: 10px !important;
+    background: rgba(255,255,255,.85) !important;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ─── Map tooltip ─── */
+  .ri-tooltip {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: var(--shadow-md);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    pointer-events: none;
+  }
+  .ri-tooltip .tt-zone { font-weight: 600; font-size: 13px; }
+  .ri-tooltip .tt-score { color: var(--ink-soft); margin-top: 1px; }
+
+  /* ─── Scrollbar ─── */
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 768px) {
+    #main { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    #sidebar { max-height: 280px; border-right: none; border-top: 1px solid var(--border); order: 2; }
+    .stats-strip { grid-template-columns: repeat(4,1fr); }
+    .brand-sub { display: none; }
+  }
+
+  #about-page {
+    grid-column: 2;
+    grid-row: 1;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Top Bar ── -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-icon">💧</span>
+      <span class="brand-name">Recharge<span>Insight</span></span>
+      <span class="brand-sub">Groundwater Recharge Suitability · Kanpur, UP</span>
+    </div>
+
+    <div style="display:flex;gap:18px;font-size:13px;">
+    <span onclick="showMap()" style="cursor:pointer">Map</span>
+    <span onclick="showAbout()" style="cursor:pointer">About</span>
+    </div>
+        
+    <div class="topbar-meta">
+      <strong>AHP Weighted Overlay</strong> · 8 Factors · EPSG:32644
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <div id="main">
+
+    <!-- ── Sidebar ── -->
+    <aside id="sidebar">
+
+      <!-- Legend -->
+      <div class="sidebar-section">
+        <div class="section-label">Recharge Suitability</div>
+
+        <div class="legend-item" data-zone="Very Good" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-very-good)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Very Good</div>
+            <div class="legend-structure">Check Dam / Percolation Tank</div>
+          </div>
+          <div class="legend-pct">10.5%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Good" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-good)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Good</div>
+            <div class="legend-structure">Percolation Tank / Recharge Well</div>
+          </div>
+          <div class="legend-pct">44.9%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Moderate" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-moderate)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Moderate</div>
+            <div class="legend-structure">Recharge Pit / Rooftop Harvesting</div>
+          </div>
+          <div class="legend-pct">29.2%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Poor" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-poor)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Poor</div>
+            <div class="legend-structure">Rooftop Rainwater Harvesting</div>
+          </div>
+          <div class="legend-pct">11.8%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Very Poor" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-very-poor)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Very Poor</div>
+            <div class="legend-structure">Not Recommended</div>
+          </div>
+          <div class="legend-pct">3.7%</div>
+        </div>
+
+        <p style="font-size:11px;color:var(--ink-soft);margin-top:12px;text-align:center;">
+          Click any zone on map or legend for details
+        </p>
+      </div>
+
+      
+
+      <!-- Zone Detail / Calculator -->
+      <div class="sidebar-section" style="flex:1">
+        <div class="section-label">Zone Detail</div>
+
+        <p id="hint-text">Click a zone on the map to explore details &amp; calculator</p>
+
+        <div id="popup-card">
+          <div class="popup-header">
+            <div class="popup-dot" id="pc-dot"></div>
+            <div class="popup-zone" id="pc-zone"></div>
+          </div>
+
+          <div class="popup-score-row">
+            <div class="score-badge" id="pc-score-badge"></div>
+            <div class="score-bar-wrap">
+              <div class="score-bar" id="pc-score-bar"></div>
+            </div>
+          </div>
+
+          <div class="rec-box">
+            <strong>Recommended Structure</strong>
+            <span id="pc-rec"></span>
+          </div>
+
+          <div style="background:#eef5ff;padding:8px;border-radius:6px;font-size:11px;margin-bottom:10px;">
+
+            💡 Use calculator to estimate potential rooftop
+            rainwater harvesting for this zone.
+
+            </div>
+          <!-- Rainwater calculator -->
+          <div>
+            <div style="margin-top:10px;margin-bottom:10px; border-top:1px solid var(--border);"></div>
+            <div class="calc-title">💧 Rainwater Harvest Estimator</div>
+            <div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;line-height:1.4;">
+            Enter roof size and rainfall to estimate how much water you can collect yearly.
+            Typical Kanpur rainfall ≈ 850 mm.
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Roof / catchment area (m²)</span>
+              <input class="calc-input" type="number" id="ci-area" value="100" min="1" />
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Annual rainfall (mm)</span>
+              <input class="calc-input" type="number" id="ci-rain" value="750" min="1" />
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Runoff coefficient</span>
+              <input class="calc-input" type="number" id="ci-runoff" value="0.8" min="0.1" max="1" step="0.05" />
+            </div>
+            <button class="calc-btn" onclick="calcHarvest()">Calculate Annual Harvest</button>
+            <div class="calc-result" id="calc-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="sidebar-section">
+        <div class="section-label">District Overview</div>
+        <div class="stats-strip">
+          <div class="stat-card">
+            <div class="stat-label">Mean Score</div>
+            <div class="stat-val">3.49</div>
+            <div class="stat-sub">out of 5.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Good+ Area</div>
+            <div class="stat-val">55.4%</div>
+            <div class="stat-sub">matches literature</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Factors</div>
+            <div class="stat-val">8</div>
+            <div class="stat-sub">AHP weighted</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Resolution</div>
+            <div class="stat-val">30 m</div>
+            <div class="stat-sub">SRTM / GEE</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── Map ── -->
+    <div id="map"></div>
+    <div id="about-page" style="display:none;padding:40px;overflow:auto;background:white;">
+
+        <h2>About RechargeInsight</h2>
+
+        <p>
+        RechargeInsight identifies groundwater recharge potential
+        using 8 environmental factors including slope,
+        soil, rainfall, geology and contamination risk.
+        </p>
+
+        <h3>Factors Used</h3>
+
+        <ul>
+        <li>Slope</li>
+        <li>Rainfall</li>
+        <li>Soil</li>
+        <li>Land Use</li>
+        <li>Groundwater level</li>
+        <li>Drainage density</li>
+        <li>Geology</li>
+        <li>Contamination risk</li>
+        </ul>
+
+        <h3>Recharge Structures</h3>
+
+        <ul>
+        <li>Check dams slow runoff.</li>
+        <li>Percolation tanks improve infiltration.</li>
+        <li>Recharge pits help urban recharge.</li>
+        <li>Rooftop harvesting stores rainwater.</li>
+        </ul>
+
+        </div>
+
+  </div>
+</div>
+
+<script>
+// ── Zone config ──
+const ZONES = {
+  "Very Good": { color: "#2d7a3a", score: 4.5, min: 4.0, rec: "Check Dam / Percolation Tank", pct: "10.5%" },
+  "Good":      { color: "#6db56e", score: 3.75, min: 3.5, rec: "Percolation Tank / Recharge Well", pct: "44.9%" },
+  "Moderate":  { color: "#e8a838", score: 3.15, min: 3.0, rec: "Recharge Pit / Rooftop Harvesting", pct: "29.2%" },
+  "Poor":      { color: "#d96c47", score: 2.65, min: 2.5, rec: "Rooftop Rainwater Harvesting", pct: "11.8%" },
+  "Very Poor": { color: "#8b1a1a", score: 1.8,  min: 0,   rec: "Not Recommended — High contamination or waterlogging risk", pct: "3.7%" },
+};
+
+// ── Map init ──
+var map = L.map('map', {
+    center: [26.4, 80.3],
+    zoom: 10,
+    preferCanvas: true
+});
+
+// Base map
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Store layers for interaction
+let layers = {};
+
+// ── Load GeoJSON ──
+fetch('suitabilityy_mmap.geojson')
+.then(response => response.json())
+.then(data => {
+
+    const geoLayer = L.geoJSON(data, {
+        smoothFactor: 0.8,
+        
+        style: function(feature) {
+            const zone = feature.properties.zone_name;
+            return {
+                fillColor: ZONES[zone].color,
+                weight: 0.5,
+                color: "#333",
+                fillOpacity: 0.7
+            };
+        },
+
+        onEachFeature: function(feature, layer) {
+            const zone = feature.properties.zone_name;
+            const cfg = ZONES[zone];
+
+            // Tooltip
+            layer.bindTooltip(
+                `<div class="ri-tooltip">
+                    <div class="tt-zone">${zone}</div>
+                    <div class="tt-score">Score ≥ ${cfg.min.toFixed(1)} · ${cfg.pct}</div>
+                </div>`,
+                { sticky: true }
+            );
+
+            // Click → open detail panel
+            layer.on('click', function(e){
+
+                const lat = e.latlng.lat.toFixed(4);
+                const lon = e.latlng.lng.toFixed(4);
+
+                showDetail(zone, lat, lon);
+
+            });
+
+            // Hover effect
+            layer.on('mouseover', function() {
+                this.setStyle({fillOpacity: 0.8 });
+            });
+
+            layer.on('mouseout', function() {
+                this.setStyle({
+                weight:0.6,
+                fillOpacity:0.7
+            });
+            });
+
+            // Store for legend interaction
+            if (!layers[zone]) layers[zone] = [];
+            layers[zone].push(layer);
+        }
+
+    }).addTo(map);
+
+    // Fit map to data
+    map.fitBounds(geoLayer.getBounds());
+});
+
+
+
+// ── Detail panel ──
+function showDetail(zone, lat=null, lon=null) {
+  const cfg = ZONES[zone];
+  document.getElementById('hint-text').style.display = 'none';
+  const card = document.getElementById('popup-card');
+  card.classList.add('visible');
+
+  document.getElementById('pc-dot').style.background = cfg.color;
+  document.getElementById('pc-zone').textContent = zone;
+  document.getElementById('pc-score-badge').textContent = `Score ≥ ${cfg.min.toFixed(1)}`;
+  document.getElementById('pc-score-bar').style.background = cfg.color;
+  document.getElementById('pc-score-bar').style.width = `${(cfg.score / 5) * 100}%`;
+  let recText = cfg.rec;
+
+  if(lat){
+  recText += `<br>
+  <span style="font-size:11px;color:#666">
+  Location: ${lat}, ${lon}
+  </span>`;
+  }
+
+  document.getElementById('pc-rec').innerHTML = recText;
+
+  // Highlight legend
+  document.querySelectorAll('.legend-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.zone === zone);
+  });
+}
+
+// ── Calculator ──
+function calcHarvest() {
+  const area   = parseFloat(document.getElementById('ci-area').value)   || 0;
+  const rain   = parseFloat(document.getElementById('ci-rain').value)   || 0;
+  const runoff = parseFloat(document.getElementById('ci-runoff').value) || 0;
+
+  const vol = area * (rain / 1000) * runoff;
+  const litres = (vol * 1000).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+  document.getElementById('calc-result').textContent =
+    `≈ ${litres} litres / year (${vol.toFixed(1)} m³)`;
+}
+
+// ── Legend click ──
+function focusZone(el) {
+  const zone = el.dataset.zone;
+  showDetail(zone);
+
+  if (layers[zone] && layers[zone][0]) {
+    const group = L.featureGroup(layers[zone]);
+    map.fitBounds(group.getBounds(), { padding: [40, 40], maxZoom: 12 });
+  }
+}
+function showAbout(){
+
+document.getElementById("map").style.display="none";
+
+document.getElementById("about-page").style.display="block";
+
+}
+
+function showMap(){
+
+document.getElementById("map").style.display="block";
+document.getElementById("about-page").style.display="none";
+map.invalidateSize();
+}
+
+
+</script>
+</body>
+</html>
