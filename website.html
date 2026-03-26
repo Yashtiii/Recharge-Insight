@@ -22,16 +22,13 @@
     --mist:      #f5f6f9;
     --white:     #ffffff;
     --border:    #e2e5ee;
-
     --z-very-good: #2d7a3a;
     --z-good:      #6db56e;
     --z-moderate:  #e8a838;
     --z-poor:      #d96c47;
     --z-very-poor: #8b1a1a;
-
     --accent:    #1e6fbd;
     --accent-lt: #eaf2fb;
-
     --radius:    12px;
     --shadow-sm: 0 2px 8px rgba(26,31,46,.07);
     --shadow-md: 0 6px 24px rgba(26,31,46,.12);
@@ -54,13 +51,13 @@
     z-index: 1000;
   }
   .topbar span{
-padding:6px 12px;
-border-radius:6px;
-}
+  padding:6px 12px;
+  border-radius:6px;
+  }
 
-.topbar span:hover{
-background:#eef3fb;
-}
+  .topbar span:hover{
+  background:#eef3fb;
+  }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand-icon { font-size: 22px; }
   .brand-name {
@@ -201,9 +198,9 @@ background:#eef3fb;
   /* ─── Map ─── */
   #map { width: 100%; height: 100%;
     border-left:1px solid var(--border);
- }
+  }
   .leaflet-container { font-family: 'DM Sans', sans-serif !important;
- }
+  }
 
   /* Custom attribution */
   .leaflet-control-attribution {
@@ -238,14 +235,103 @@ background:#eef3fb;
     .brand-sub { display: none; }
   }
 
-  #about-page {
-    grid-column: 2;
-    grid-row: 1;
+  #about-page{
+    padding:40px 60px;
+    line-height:1.7;
+    font-size:14px;
+    color:#2a2f3a;
+    max-width:900px;
+    margin:auto;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.05);
+    grid-column:2;
+    grid-row:1;
+    height:100%;
+    overflow-y:auto;
+    scroll-behavior:smooth;
+    }
+
+  #about-page h2{
+    top:0;
+    background:white;
+    padding-top:10px;
+    padding-bottom:14px;
+    z-index:50;
+    border-bottom:1px solid #e5e7eb;
+    margin-bottom:20px;
+    }
+
+    #about-page h3{
+    margin-top:28px;
+    margin-bottom:10px;
+    border-bottom:1px solid #e5e7eb;
+    padding-bottom:4px;
+    }
+
+  #about-page p{
+    margin-bottom:16px;
+    max-width:800px;
+    }
+
+  #about-page ul{
+    margin-top:8px;
+    margin-bottom:18px;
+    padding-left:20px;
+    }
+
+  #about-page li{
+    margin-bottom:6px;
+    }
+
+  .about-layout{
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    gap:40px;
+    max-width:1100px;
+    margin:auto;
   }
+
+  .about-main{
+    line-height:1.7;
+  }
+
+  .about-side{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+
+  .info-card{
+    background:#f7f9fc;
+    padding:18px;
+    border-radius:10px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.05);
+    font-size:13px;
+  }
+
+  .info-card h4{
+    margin-bottom:10px;
+    border-bottom:1px solid #e5e7eb;
+    padding-bottom:4px;
+    }
+
+  @media(max-width:900px){
+    .about-layout{
+    grid-template-columns:1fr;
+    }
+}
 </style>
 </head>
+
 <body>
 <div id="app">
+    <div style="background:#f4f7fb;padding:12px;border-radius:8px;font-size:12px;margin-bottom:15px;line-height:1.4;">
+    <strong>RechargeInsight</strong> identifies groundwater recharge
+    zones across Kanpur using geospatial analysis.
+    Click any location to see suitability and recommended
+    recharge structures.
+    </div>
 
   <!-- ── Top Bar ── -->
   <header id="topbar">
@@ -362,8 +448,14 @@ background:#eef3fb;
             <div style="margin-top:10px;margin-bottom:10px; border-top:1px solid var(--border);"></div>
             <div class="calc-title">💧 Rainwater Harvest Estimator</div>
             <div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;line-height:1.4;">
-            Enter roof size and rainfall to estimate how much water you can collect yearly.
-            Typical Kanpur rainfall ≈ 850 mm.
+            Estimate how much rainwater your building could harvest yearly.
+
+            Steps:
+            1) Enter roof size (small house ≈ 80–120 m²)
+            2) Use Kanpur rainfall (~850 mm)
+            3) Select your roof type
+
+            Result shows yearly harvest potential.
             </div>
             <div class="calc-row">
               <span class="calc-label">Roof / catchment area (m²)</span>
@@ -374,9 +466,26 @@ background:#eef3fb;
               <input class="calc-input" type="number" id="ci-rain" value="750" min="1" />
             </div>
             <div class="calc-row">
-              <span class="calc-label">Runoff coefficient</span>
-              <input class="calc-input" type="number" id="ci-runoff" value="0.8" min="0.1" max="1" step="0.05" />
+            <span class="calc-label">Roof type</span>
+
+            <select class="calc-input" id="ci-roof">
+
+            <option value="0.85">Concrete roof (best collection)</option>
+
+            <option value="0.80">Metal sheet roof</option>
+
+            <option value="0.75">Tiles</option>
+
+            <option value="0.60">Rough surface</option>
+
+            </select>
+
             </div>
+
+          <div style="font-size:10px;color:var(--ink-soft);margin-top:4px;">
+          Roof material determines how much rainwater can be collected.
+          </div>
+
             <button class="calc-btn" onclick="calcHarvest()">Calculate Annual Harvest</button>
             <div class="calc-result" id="calc-result"></div>
           </div>
@@ -411,42 +520,190 @@ background:#eef3fb;
       </div>
 
     </aside>
+    <div id="loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:15px 25px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-size:13px;z-index:1000;">
+
+    Loading suitability map…
+
+    </div>
 
     <!-- ── Map ── -->
     <div id="map"></div>
     <div id="about-page" style="display:none;padding:40px;overflow:auto;background:white;">
+      <div class="about-layout">
 
-        <h2>About RechargeInsight</h2>
+      <div class="about-main">
+      <h2>About RechargeInsight</h2>
 
         <p>
-        RechargeInsight identifies groundwater recharge potential
-        using 8 environmental factors including slope,
-        soil, rainfall, geology and contamination risk.
+        RechargeInsight is a geospatial decision support platform
+        developed to identify groundwater recharge suitability zones
+        across Kanpur Nagar and Kanpur Dehat using multi-criteria
+        environmental analysis.
         </p>
 
-        <h3>Factors Used</h3>
+        <h3>Project Objective</h3>
+
+        <p>
+        The system helps planners and researchers identify suitable
+        locations for groundwater recharge structures such as
+        check dams, percolation tanks and recharge pits.
+        </p>
+
+        <h3>Why This Matters</h3>
+
+        <p>
+        Kanpur faces groundwater depletion and localized
+        contamination challenges. Existing recharge studies
+        often ignore contamination risk. RechargeInsight attempts
+        to incorporate this factor into suitability analysis.
+        </p>
+
+        <h3>Factors Considered</h3>
+
+        <p>
+        Suitability is evaluated using eight environmental factors:
+        </p>
 
         <ul>
+        <li>Soil Texture</li>
         <li>Slope</li>
         <li>Rainfall</li>
-        <li>Soil</li>
-        <li>Land Use</li>
-        <li>Groundwater level</li>
-        <li>Drainage density</li>
+        <li>Groundwater Level</li>
+        <li>Land Use/Land Cover</li>
         <li>Geology</li>
-        <li>Contamination risk</li>
+        <li>Drainage Density</li>
+        <li>Contamination Risk</li>
         </ul>
 
-        <h3>Recharge Structures</h3>
+
+
+        <h3>Contamination Risk Modeling</h3>
+
+        <p>
+        Contamination risk was approximated using built-up
+        land cover derived from Dynamic World V1 (2023).
+        Built-up areas were considered higher risk zones
+        due to potential industrial and urban pollution sources.
+        </p>
+
+        <p>
+        This serves as a proxy indicator due to the lack of
+        high-resolution industrial contamination datasets.
+        </p>
+
+        <h3>Method Overview</h3>
+
+        <p>
+        All factors were standardized and combined using
+        multi-criteria suitability analysis to produce
+        five recharge suitability zones.
+        </p>
+
+        <h3>Suitability Classes</h3>
 
         <ul>
-        <li>Check dams slow runoff.</li>
-        <li>Percolation tanks improve infiltration.</li>
-        <li>Recharge pits help urban recharge.</li>
-        <li>Rooftop harvesting stores rainwater.</li>
+
+        <li>Very Good – Highly suitable recharge zones</li>
+
+        <li>Good – Suitable with minor constraints</li>
+
+        <li>Moderate – Conditional recharge potential</li>
+
+        <li>Poor – Limited suitability</li>
+
+        <li>Very Poor – Not recommended</li>
+
         </ul>
 
-        </div>
+        <h3>Limitations</h3>
+
+        <ul>
+
+        <li>Built-up layer used as contamination proxy</li>
+
+        <li>District level groundwater data resolution</li>
+
+        <li>Geological variability uncertainties</li>
+
+        </ul>
+
+        <h3>Future Scope</h3>
+
+        <ul>
+
+        <li>Industrial cluster datasets integration</li>
+
+        <li>Machine learning validation models</li>
+
+        <li>Temporal groundwater trend analysis</li>
+
+        <li>Expanded district coverage</li>
+
+        </ul>
+
+        <h3>Technology Stack</h3>
+
+        <ul>
+
+        <li>Google Earth Engine</li>
+
+        <li>QGIS</li>
+
+        <li>Python (GeoPandas, Rasterio)</li>
+
+        <li>Leaflet.js</li>
+
+        </ul>
+      </div>
+
+
+
+
+<div class="about-side">
+
+<div class="info-card">
+
+<h4>Model Summary</h4>
+
+<p>Method: AHP Weighted Overlay</p>
+
+<p>Factors: 8</p>
+
+<p>Resolution: 30m</p>
+
+<p>Study Area: Kanpur</p>
+
+</div>
+
+<div class="info-card">
+
+<h4>Data Sources</h4>
+
+<p>Google Earth Engine</p>
+
+<p>India-WRIS</p>
+
+<p>CGWB</p>
+
+<p>NBSS&LUP</p>
+
+</div>
+
+<div class="info-card">
+
+<h4>Output</h4>
+
+<p>Suitability zones</p>
+
+<p>Recharge structures</p>
+
+<p>Decision support</p>
+
+</div>
+
+</div>
+</div>
+    </div>
 
   </div>
 </div>
@@ -454,11 +711,11 @@ background:#eef3fb;
 <script>
 // ── Zone config ──
 const ZONES = {
-  "Very Good": { color: "#2d7a3a", score: 4.5, min: 4.0, rec: "Check Dam / Percolation Tank", pct: "10.5%" },
-  "Good":      { color: "#6db56e", score: 3.75, min: 3.5, rec: "Percolation Tank / Recharge Well", pct: "44.9%" },
-  "Moderate":  { color: "#e8a838", score: 3.15, min: 3.0, rec: "Recharge Pit / Rooftop Harvesting", pct: "29.2%" },
-  "Poor":      { color: "#d96c47", score: 2.65, min: 2.5, rec: "Rooftop Rainwater Harvesting", pct: "11.8%" },
-  "Very Poor": { color: "#8b1a1a", score: 1.8,  min: 0,   rec: "Not Recommended — High contamination or waterlogging risk", pct: "3.7%" },
+  "Very Good": { color: "#135708", score: 4.5, min: 4.0, rec: "Check Dam / Percolation Tank", pct: "10.5%" },
+  "Good":      { color: "#39de3b", score: 3.75, min: 3.5, rec: "Percolation Tank / Recharge Well", pct: "44.9%" },
+  "Moderate":  { color: "#f6e020", score: 3.15, min: 3.0, rec: "Recharge Pit / Rooftop Harvesting", pct: "29.2%" },
+  "Poor":      { color: "#ff7f08", score: 2.65, min: 2.5, rec: "Rooftop Rainwater Harvesting", pct: "11.8%" },
+  "Very Poor": { color: "#ff0000", score: 1.8,  min: 0,   rec: "Not Recommended — High contamination or waterlogging risk", pct: "3.7%" },
 };
 
 // ── Map init ──
@@ -475,22 +732,30 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Store layers for interaction
 let layers = {};
+let geoLayer;
+let baseOpacity = 0.52;
+let currentZone;
 
 // ── Load GeoJSON ──
 fetch('suitabilityy_mmap.geojson')
 .then(response => response.json())
 .then(data => {
 
-    const geoLayer = L.geoJSON(data, {
+    geoLayer = L.geoJSON(data, {
         smoothFactor: 0.8,
         
         style: function(feature) {
             const zone = feature.properties.zone_name;
             return {
                 fillColor: ZONES[zone].color,
-                weight: 0.5,
-                color: "#333",
-                fillOpacity: 0.7
+
+                weight:0.25,
+
+                color:"#767676",
+
+                opacity:0.50,
+
+                fillOpacity:0.55
             };
         },
 
@@ -512,32 +777,67 @@ fetch('suitabilityy_mmap.geojson')
 
                 const lat = e.latlng.lat.toFixed(4);
                 const lon = e.latlng.lng.toFixed(4);
-
+                let currentZone;
                 showDetail(zone, lat, lon);
 
             });
 
+            // Base opacity variable (global)
+            let baseOpacity = 0.52;
+
             // Hover effect
             layer.on('mouseover', function() {
-                this.setStyle({fillOpacity: 0.8 });
+
+            this.setStyle({
+
+            fillOpacity: baseOpacity + 0.12,
+            weight:0.7
+
+            });
+
             });
 
             layer.on('mouseout', function() {
-                this.setStyle({
-                weight:0.6,
-                fillOpacity:0.7
-            });
+
+            this.setStyle({
+
+            weight:0.35,
+            fillOpacity: baseOpacity
+
             });
 
-            // Store for legend interaction
-            if (!layers[zone]) layers[zone] = [];
-            layers[zone].push(layer);
+            });
+
+            
         }
 
     }).addTo(map);
 
+    map.on('zoomend', function(){
+
+    let zoom = map.getZoom();
+
+    if(zoom <= 10) baseOpacity = 0.52;
+
+    else if(zoom <= 12) baseOpacity = 0.42;
+
+    else baseOpacity = 0.30;
+
+    geoLayer.eachLayer(function(layer){
+
+    layer.setStyle({
+
+    fillOpacity: baseOpacity
+
+    });
+
+    });
+
+    });
+
     // Fit map to data
     map.fitBounds(geoLayer.getBounds());
+    document.getElementById("loading").style.display="none";
 });
 
 
@@ -573,15 +873,86 @@ function showDetail(zone, lat=null, lon=null) {
 
 // ── Calculator ──
 function calcHarvest() {
-  const area   = parseFloat(document.getElementById('ci-area').value)   || 0;
-  const rain   = parseFloat(document.getElementById('ci-rain').value)   || 0;
-  const runoff = parseFloat(document.getElementById('ci-runoff').value) || 0;
 
-  const vol = area * (rain / 1000) * runoff;
-  const litres = (vol * 1000).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+const area = parseFloat(document.getElementById('ci-area').value) || 0;
 
-  document.getElementById('calc-result').textContent =
-    `≈ ${litres} litres / year (${vol.toFixed(1)} m³)`;
+const rain = parseFloat(document.getElementById('ci-rain').value) || 0;
+
+const runoff = parseFloat(document.getElementById('ci-roof').value) || 0;
+
+// Volume in cubic meters
+const vol = area * (rain / 1000) * runoff;
+
+// Convert to litres
+const litres = Math.round(vol * 1000).toLocaleString('en-IN');
+
+let message = `
+<div style="font-weight:600;">
+≈ ${litres} litres/year
+</div>
+
+<div style="font-size:11px;color:#555;">
+(${vol.toFixed(1)} cubic meters)
+</div>
+`;
+
+// Interpretation
+if(vol > 80){
+
+message += `
+<div style="font-size:11px;color:#2e7d32;margin-top:6px;">
+✔ Good potential for rooftop harvesting
+</div>
+`;
+
+}
+else if(vol > 40){
+
+message += `
+<div style="font-size:11px;color:#e6a23c;margin-top:6px;">
+Moderate harvesting benefit
+</div>
+`;
+
+}
+else{
+
+message += `
+<div style="font-size:11px;color:#d96c47;margin-top:6px;">
+Limited harvesting benefit
+</div>
+`;
+
+}
+
+// Real world comparison
+message += `
+<div style="font-size:11px;color:#555;margin-top:6px;">
+≈ ${Math.round(vol/0.15)} days of household water use
+</div>
+`;
+
+// Zone recommendation (if zone selected)
+if(typeof currentZone !== "undefined"){
+
+message += `
+<div style="
+font-size:11px;
+margin-top:8px;
+padding:6px;
+background:#f4f7fb;
+border-radius:6px;
+">
+
+Recommended structure: ${ZONES[currentZone].rec}
+
+</div>
+`;
+
+}
+
+document.getElementById('calc-result').innerHTML = message;
+
 }
 
 // ── Legend click ──
