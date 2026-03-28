@@ -1,0 +1,205 @@
+ ── Sidebar ──
+    <aside id="sidebar">
+
+      <!-- Legend -->
+      <div class="sidebar-section">
+        <div class="section-label">Recharge Suitability</div>
+
+        <div class="legend-item" data-zone="Very Good" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-very-good)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Very Good</div>
+            <div class="legend-structure">Check Dam / Percolation Tank</div>
+          </div>
+          <div class="legend-pct">10.5%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Good" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-good)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Good</div>
+            <div class="legend-structure">Percolation Tank / Recharge Well</div>
+          </div>
+          <div class="legend-pct">44.9%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Moderate" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-moderate)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Moderate</div>
+            <div class="legend-structure">Recharge Pit / Rooftop Harvesting</div>
+          </div>
+          <div class="legend-pct">29.2%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Poor" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-poor)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Poor</div>
+            <div class="legend-structure">Rooftop Rainwater Harvesting</div>
+          </div>
+          <div class="legend-pct">11.8%</div>
+        </div>
+
+        <div class="legend-item" data-zone="Very Poor" onclick="focusZone(this)">
+          <div class="swatch" style="background:var(--z-very-poor)"></div>
+          <div class="legend-content">
+            <div class="legend-zone">Very Poor</div>
+            <div class="legend-structure">Not Recommended</div>
+          </div>
+          <div class="legend-pct">3.7%</div>
+        </div>
+
+        <p style="font-size:11px;color:var(--ink-soft);margin-top:12px;text-align:center;">
+          Click any zone on map or legend for details
+        </p>
+      </div>
+
+      
+
+      <!-- Zone Detail / Calculator -->
+      <div class="sidebar-section" style="flex:1">
+        <div class="section-label">Zone Detail</div>
+
+        <p id="hint-text">Click a zone on the map to explore details &amp; calculator</p>
+
+        <div id="popup-card">
+          <div class="popup-header">
+            <div class="popup-dot" id="pc-dot"></div>
+            <div class="popup-zone" id="pc-zone"></div>
+          </div>
+
+          <div class="popup-score-row">
+            <div class="score-badge" id="pc-score-badge"></div>
+            <div class="score-bar-wrap">
+              <div class="score-bar" id="pc-score-bar"></div>
+            </div>
+          </div>
+
+          <div class="rec-box">
+            <strong>Recommended Structure</strong>
+            <span id="pc-rec"></span>
+          </div>
+
+          <div style="background:#eef5ff;padding:8px;border-radius:6px;font-size:11px;margin-bottom:10px;">
+
+            💡 Use calculator to estimate potential rooftop
+            rainwater harvesting for this zone.
+
+            </div>
+          <!-- Rainwater calculator -->
+          <div>
+            <div style="margin-top:10px;margin-bottom:10px; border-top:1px solid var(--border);"></div>
+            <div class="calc-title">💧 Rainwater Harvest Estimator</div>
+            <div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;line-height:1.4;">
+            Estimate how much rainwater your building could harvest yearly.
+
+            Steps:
+            1) Enter roof size (small house ≈ 80–120 m²)
+            2) Use Kanpur rainfall (~850 mm)
+            3) Select your roof type
+
+            Result shows yearly harvest potential.
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Roof / catchment area (m²)</span>
+              <input class="calc-input" type="number" id="ci-area" value="100" min="1" />
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Annual rainfall (mm)</span>
+              <input class="calc-input" type="number" id="ci-rain" value="750" min="1" />
+            </div>
+            <div class="calc-row">
+            <span class="calc-label">Roof type</span>
+
+            <select class="calc-input" id="ci-roof">
+
+            <option value="0.85">Concrete roof (best collection)</option>
+
+            <option value="0.80">Metal sheet roof</option>
+
+            <option value="0.75">Tiles</option>
+
+            <option value="0.60">Rough surface</option>
+
+            </select>
+
+            </div>
+
+          <div style="font-size:10px;color:var(--ink-soft);margin-top:4px;">
+          Roof material determines how much rainwater can be collected.
+          </div>
+
+            <button class="calc-btn" onclick="calcHarvest()">Calculate Annual Harvest</button>
+            <div class="calc-result" id="calc-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="sidebar-section">
+        <div class="section-label">District Overview</div>
+        <div class="stats-strip">
+          <div class="stat-card">
+            <div class="stat-label">Mean Score</div>
+            <div class="stat-val">3.49</div>
+            <div class="stat-sub">out of 5.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Good+ Area</div>
+            <div class="stat-val">55.4%</div>
+            <div class="stat-sub">matches literature</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Factors</div>
+            <div class="stat-val">8</div>
+            <div class="stat-sub">AHP weighted</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Resolution</div>
+            <div class="stat-val">30 m</div>
+            <div class="stat-sub">SRTM / GEE</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+
+
+
+
+/* Legend */
+  .legend-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; transition: background .15s;
+    margin-bottom: 3px;
+  }
+  .legend-item:hover { background:#eef3fb; }
+  .legend-item.active { background: var(--accent-lt); }
+  .swatch {
+    width: 14px; height: 14px; border-radius: 4px;
+    flex-shrink: 0; margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .legend-content { flex: 1; }
+  .legend-zone { font-size: 15px; font-weight: 500; line-height: 1.2; }
+  .legend-structure { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .legend-pct {
+    font-size: 11px; font-weight: 600; color: var(--ink-soft);
+    background: var(--mist); padding: 2px 6px; border-radius: 20px;
+    align-self: center; white-space: nowrap;
+  }
+  .legend-item.active .legend-pct { background: var(--accent); color: #fff; }
+
+  /* Stats strip */
+  .stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .stat-card {
+    background: var(--mist); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat-label { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .6px; }
+  .stat-val { font-size: 19px; font-weight: 600; color: var(--ink); line-height: 1.2; margin-top: 1px; }
+  .stat-sub { font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
