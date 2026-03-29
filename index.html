@@ -202,7 +202,25 @@
     .brand-sub { display: none; }
   }
 
-  #about-page,#calculator{
+  #calculator{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+display:flex;
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+overflow-y:auto;
+z-index:2;
+padding-top:40px;
+background:white;
+}
+  #about-page{
     position:absolute;
     top:0;
     left:0;
@@ -212,8 +230,6 @@
     z-index:2;
     padding:40px 60px;
     background:white;
-    }
-  #about-page{
     line-height:1.7;
     font-size:14px;
     color:#2a2f3a;
@@ -315,18 +331,7 @@
     color:white;
   }
 
-  #legend-card{
-    position:absolute;
-    left:20px;
-    top:80px;
-    width:260px;
-    background:white;
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.08);
-    font-size:14px;
-    z-index:1000;
-  }
+
 
   .legend-row{
     display:flex;
@@ -349,30 +354,75 @@
     gap:8px;
     }
 
-  #stats-card{
-    position:absolute;
-    left:20px;
-    top:260px;
-    width:270px;
-    background:white;
-    padding:18px;
-    border-radius:14px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    z-index:1000;
-    line-height:1.6; 
-  }
+  #map-left-panel{
+position:absolute;
+left:20px;
+top:80px;
+
+display:flex;
+flex-direction:column;
+gap:18px;
+
+z-index:1000;
+}
+
+#legend-card{
+
+width:270px;
+
+background:white;
+padding:18px;
+
+border-radius:14px;
+
+box-shadow:0 8px 30px rgba(0,0,0,0.08);
+
+font-size:14px;
+
+}
+
+#stats-card{
+
+width:270px;
+
+background:white;
+padding:18px;
+
+border-radius:14px;
+
+box-shadow:0 8px 30px rgba(0,0,0,0.08);
+
+line-height:1.6;
+
+}
+
+
+#legend-card h3,
+#stats-card h3{
+font-size:16px;
+margin-bottom:10px;
+}
 
   #zone-card{
-    position:absolute;
-    right: 25px;
-    bottom:25px;
-    width:300px;
-    background:white;
-    padding:20px;
-    border-radius:16px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-    z-index: 1000;
-    line-height:1.6;
+position:absolute;
+
+right:25px;
+top:90px;
+
+width:300px;
+
+background:white;
+
+padding:20px;
+
+border-radius:16px;
+
+box-shadow:0 12px 40px rgba(0,0,0,0.12);
+
+z-index:1000;
+
+line-height:1.6;
+transition:.25s;
   }
 
   #map{
@@ -432,7 +482,7 @@
 
       <!-- ── Map ── -->
       <div id="map"></div>
-
+<div id="map-left-panel">
       <div id="legend-card">
           <h3>Recharge Suitability</h3>
           <div class="legend-row">
@@ -464,6 +514,7 @@
           <div><b>Factors:</b> 8</div>
           <div><b>Resolution:</b> 30m</div>
       </div>
+  </div>
 
       <div id="zone-card">
           <h3 id="zone-name"></h3>
@@ -586,49 +637,146 @@
           </div>
 
         </div>
+
+        <div style="
+margin-top:40px;
+padding-top:20px;
+border-top:1px solid #e5e7eb;
+max-width:800px;
+">
+
+<h3>Project Author</h3>
+
+<p>
+<strong>Yashti Sahu</strong><br>
+</p>
+
+<div style="
+display:flex;
+gap:20px;
+margin-top:10px;
+">
+
+<a href="https://www.linkedin.com/in/yashti-sahu-profile/"
+target="_blank"
+style="
+text-decoration:none;
+color:#0284c7;
+font-weight:500;
+">
+
+LinkedIn
+
+</a>
+
+<a href="https://github.com/Yashtiii"
+target="_blank"
+style="
+text-decoration:none;
+color:#0284c7;
+font-weight:500;
+">
+
+GitHub
+
+</a>
+
+</div>
+
+</div>
       </div> 
 
       <div id="calculator" style="display:none;">
-          <h2>Rainwater Harvest Estimator</h2>
-              <p>Estimate how much rainwater your rooftop can collect annually.</p>
+        <div style="text-align:center;margin-bottom:30px;">
+              <h2 style="font-size:32px;">
+Rooftop Rainwater Potential
+</h2>
+              <p style="color:#64748b;font-size:16px;">
+Find how much rainwater your house can collect every year in Kanpur.
+</p>
+</div>
+              
+              <div style="display:grid;
+grid-template-columns: 380px 520px;
+gap:60px;
+justify-content:center;
+align-items:center;
+              ">
 
-          <h3>How to use</h3>
-              <ol>
-                  <li>Enter roof size (example: 100 m²)</li>
-                  <li>Enter rainfall (Kanpur ≈ 850 mm)</li>
-                  <li>Select roof type</li>
-                  <li>Click calculate</li>
-              </ol>
+              <!-- INPUT CARD -->
 
-          <h3>Example</h3>
-              <p>100 m² roof × 850 mm rainfall × 0.85 coefficient≈ <strong>72,250 litres/year</strong></p>
+              <div style="
+              background:white;
+              padding:25px;
+              border-radius:14px;
+              box-shadow:0 8px 30px rgba(0,0,0,0.08);
+              ">
 
-          <h3>Calculator</h3>
-              <div style="max-width:400px;margin-top:20px;">
-                  <div class="calc-row">
-                    <span class="calc-label">Roof area</span>
-                    <input class="calc-input" id="ci-area">
-                  </div>
+              <h3 style="margin-bottom:18px;">Your Roof Details</h3>
 
-                  <div class="calc-row">
-                    <span class="calc-label">Rainfall</span>
-                    <input class="calc-input" id="ci-rain">
-                  </div>
-
-                  <div class="calc-row">
-                    <span class="calc-label">Roof type</span>
-                    <select class="calc-input" id="ci-roof">
-                      <option value="0.85">Concrete</option>
-                      <option value="0.80">Metal</option>
-                      <option value="0.75">Tiles</option>
-                      <option value="0.60">Rough</option>
-                    </select>
-                  </div>
-
-                  <button class="calc-btn" onclick="calcHarvest()"> Calculate </button>
-
-                  <div id="calc-result"></div>
+              <div class="calc-row">
+              <span class="calc-label">Roof area (m²)</span>
+              <input class="calc-input" id="ci-area" value="100">
               </div>
+
+              <div class="calc-row">
+              <span class="calc-label">Kanpur rainfall (mm)</span>
+              <input class="calc-input" id="ci-rain" value="850">
+              </div>
+
+              <div class="calc-row">
+              <span class="calc-label">Roof material</span>
+
+              <select class="calc-input" id="ci-roof">
+
+              <option value="0.85">Concrete</option>
+
+              <option value="0.80">Metal</option>
+
+              <option value="0.75">Tiles</option>
+
+              <option value="0.60">Rough surface</option>
+
+              </select>
+
+              </div>
+
+              <button class="calc-btn"
+              style="margin-top:18px;font-size:14px;padding:12px;"
+              onclick="calcHarvest()">
+
+              Calculate Water Potential
+
+              </button>
+
+              </div>
+
+
+              <!-- RESULT CARD -->
+
+              <div id="calc-result"
+              style="
+              background:white;
+              padding:30px;
+              border-radius:16px;
+              box-shadow:0 12px 40px rgba(0,0,0,0.1);
+              min-height:220px;
+              display:flex;
+              flex-direction:column;
+              justify-content:center;
+              ">
+
+              <div style="color:#64748b;">
+              Enter roof details and click calculate
+              </div>
+
+              </div>
+
+              </div>
+
+              </div>
+
+      
       </div>
     </div>
 </div>
@@ -741,6 +889,12 @@ function showDetail(zone, lat=null, lon=null){
     if(lat){
     recText += "<br><span style='font-size:11px;color:#666'>Location: " + lat + ", " + lon +"</span>";
     }
+
+    document.getElementById("zone-card").style.transform="scale(1.02)";
+
+setTimeout(()=>{
+document.getElementById("zone-card").style.transform="scale(1)";
+},150);
     document.getElementById("zone-name").innerText = zone;
     document.getElementById("zone-rec").innerHTML = recText;
     document.getElementById("zone-score").innerText = "Score ≥ " + cfg.min.toFixed(1);
@@ -756,27 +910,107 @@ function calcHarvest() {
     // Convert to litres
     const litres = Math.round(vol * 1000).toLocaleString('en-IN');
 
-    let message = `<div style="font-weight:600;"> ≈ ${litres} litres/year </div>
-                  <div style="font-size:11px;color:#555;">(${vol.toFixed(1)} cubic meters)</div>`;
+    let message = `<div style="font-size:42px;font-weight:700;color:#0284c7;">${litres} L</div>
+                  <div style="color:#64748b;margin-top:6px;">Water you can collect per year</div>
+                  <div style="
+                  margin-top:20px;
+                  padding:15px;
+                  background:#f0f9ff;
+                  border-radius:10px;
+                  font-size:14px;">
+                  ≈ ${Math.round(vol/0.15)} days of household water use</div>`;
+
+    
 
     // Interpretation
     if(vol > 80){
-        message += `<div style="font-size:11px;color:#2e7d32;margin-top:6px;">✔ Good potential for rooftop harvesting</div>`;
+         message += `
+<div style="
+margin-top:15px;
+color:#166534;
+font-weight:600;
+">
+
+Good rainwater harvesting potential
+
+</div>
+
+<div style="font-size:13px;color:#475569;">
+Installing a storage tank or recharge pit is recommended.
+</div>
+`;
     }
     else if(vol > 40){
-        message += `<div style="font-size:11px;color:#e6a23c;margin-top:6px;">Moderate harvesting benefit</div>`;
+
+message += `
+<div style="
+margin-top:15px;
+color:#b45309;
+font-weight:600;
+">
+
+Moderate potential
+
+</div>
+
+<div style="font-size:13px;color:#475569;">
+Rooftop harvesting can still reduce groundwater use.
+</div>
+`;
     }
     else{
-        message += `<div style="font-size:11px;color:#d96c47;margin-top:6px;">Limited harvesting benefit</div>`;
+         message += `
+<div style="
+margin-top:15px;
+color:#b91c1c;
+font-weight:600;
+">
+
+Limited benefit
+
+</div>
+
+<div style="font-size:13px;color:#475569;">
+Harvesting possible but storage may be small.
+</div>
+`;
     }
 
     // Real world comparison
-    message += `<div style="font-size:11px;color:#555;margin-top:6px;">≈ ${Math.round(vol/0.15)} days of household water use</div>`;
+    message += `
+<div style="
+margin-top:18px;
+font-size:13px;
+color:#334155;
+">
+
+Equivalent to:
+
+• ${Math.round(vol/0.15)} days household water  
+• ${Math.round(vol/0.003)} days drinking water  
+
+</div>
+`;
 
     // Zone recommendation (if zone selected)
     if(typeof currentZone !== "undefined"){
-        message += `<div style="font-size:11px;margin-top:8px;padding:6px;background:#f4f7fb;border-radius:6px;">
-        Recommended structure: ${ZONES[currentZone].rec}</div>`;
+        message += `
+
+<div style="
+margin-top:20px;
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
+font-size:14px;
+">
+
+Recommended structure here:
+
+<strong>${ZONES[currentZone].rec}</strong>
+
+</div>
+
+`;
     }
 
     document.getElementById('calc-result').innerHTML = message;

@@ -203,3 +203,78 @@
   .stat-label { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .6px; }
   .stat-val { font-size: 19px; font-weight: 600; color: var(--ink); line-height: 1.2; margin-top: 1px; }
   .stat-sub { font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+
+
+
+  <div id="calculator" style="display:none;">
+          <h2>Rainwater Harvest Estimator</h2>
+              <p>Estimate how much rainwater your rooftop can collect annually.</p>
+
+          <h3>How to use</h3>
+              <ol>
+                  <li>Enter roof size (example: 100 m²)</li>
+                  <li>Enter rainfall (Kanpur ≈ 850 mm)</li>
+                  <li>Select roof type</li>
+                  <li>Click calculate</li>
+              </ol>
+
+          <h3>Example</h3>
+              <p>100 m² roof × 850 mm rainfall × 0.85 coefficient≈ <strong>72,250 litres/year</strong></p>
+
+          <h3>Calculator</h3>
+              <div style="max-width:400px;margin-top:20px;">
+                  <div class="calc-row">
+                    <span class="calc-label">Roof area</span>
+                    <input class="calc-input" id="ci-area">
+                  </div>
+
+                  <div class="calc-row">
+                    <span class="calc-label">Rainfall</span>
+                    <input class="calc-input" id="ci-rain">
+                  </div>
+
+                  <div class="calc-row">
+                    <span class="calc-label">Roof type</span>
+                    <select class="calc-input" id="ci-roof">
+                      <option value="0.85">Concrete</option>
+                      <option value="0.80">Metal</option>
+                      <option value="0.75">Tiles</option>
+                      <option value="0.60">Rough</option>
+                    </select>
+                  </div>
+
+                  <button class="calc-btn" onclick="calcHarvest()"> Calculate </button>
+
+                  <div id="calc-result"></div>
+              </div>
+
+
+
+
+
+
+    #legend-card{
+    position:absolute;
+    left:20px;
+    top:80px;
+    width:260px;
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.08);
+    font-size:14px;
+    z-index:1000;
+  }
+
+  #stats-card{
+    position:absolute;
+    left:20px;
+    top:260px;
+    width:270px;
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    z-index:1000;
+    line-height:1.6; 
+  }
